@@ -13,7 +13,8 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use stdClass;
 use App\Entity\Lego;
-
+use App\Service\CreditsGenerator;
+use App\Service\DatabaseInterface;
 
 /* le nom de la classe doit être cohérent avec le nom du fichier */
 
@@ -44,43 +45,37 @@ class LegoController extends AbstractController
         return $this->legos;
     }
 
-    // L’attribute #[Route] indique ici que l'on associe la route
-    // "/" à la méthode home pour que Symfony l'exécute chaque fois
-    // que l'on accède à la racine de notre site.
 
 
     #[Route('/',)]
-    public function home()
+    public function home(DatabaseInterface $dbinterface): Response
     {
+        $this->legos = $dbinterface->getAllLegos();
 
-        // the template path is the relative file path from `templates/`
         return $this->render('lego.html.twig', ['legos' => $this->legos]);
     }
 
-    //    #[Route('/creator', )]
-    //    public function creator()
-    //    {
-    //         return $this->render('lego.html.twig', ['legos' => array_filter($this->legos, function($lego) { return $lego->getCollection() === "Creator"; })]);
-    //    }
 
-    //    #[Route('/star_wars', )]
-    //    public function starWars()
-    //    {
-    //         return $this->render('lego.html.twig', ['legos' => array_filter($this->legos, function($lego) { return $lego->getCollection() === "Star Wars"; })]);
-    //    }
-    //    #[Route('/creator_expert', )]
-    //    public function creatorExpert()
-    //    {
-    //         return $this->render('lego.html.twig', ['legos' => array_filter($this->legos, function($lego) { return $lego->getCollection() === "Creator Expert"; })]);
-    //    }
     
+
     #[Route('/{collection}', 'filter_by_collection', requirements: ['collection' => '(creator|star_wars|creator_expert)'])]
-    public function filter($collection): Response
+    public function filter(DatabaseInterface $dbinterface, $collection): Response
     {
+        $collectionMAJ = str_replace('_',' ', strtolower($collection));
         
-        return $this->render('lego.html.twig', ['legos' => array_filter($this->legos, function($lego) use ($collection) {return strtolower($lego->getCollection()) == str_replace('_',' ', strtolower($collection));})]);
+        $this->legos = $dbinterface->getLegosByCollection($collectionMAJ);
+
+        return $this->render('lego.html.twig', ['legos' => $this->legos]);
         
     }
+
+
+    #[Route('/credits', 'credits')]
+    public function credits(CreditsGenerator $credits): Response
+    {
+        return new Response($credits->getCredits());
+    }
+
 
 
     #[Route('/me',)]
