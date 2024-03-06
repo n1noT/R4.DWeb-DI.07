@@ -1,13 +1,26 @@
 {% extends 'base.html.twig' %}
 
+
+
 {% block body %}
+
+
+      <nav>
+          <a href="/">All</a> |
+            
+          {% for collection in collections %}
+                    <a href="/{{collection.link}}">{{collection.name}}</a> |
+                    
+          {% endfor %}
+      </nav>
+
 
 {% for lego in legos %}
 <div class="lego_card">
       <div class="info_section">
         <div class="lego_header">
-          <img class="locandina" src="/images/{{lego.imagebox}}"/>
-          <h1>{{lego.name}}</h1>
+          <img class="locandina" src="/images/{{lego.boxImage}}"/>
+          <h1>{{lego.nom}}</h1>
           <h4>Collection : {{lego.collection}}</h4>
           <span class="pieces">Pièces : {{lego.pieces}}</span>
           <p class="price">{{lego.price}}€</p><br>
@@ -29,7 +42,7 @@
 
       </div>
       <div class="blur_back">
-        <img src="/images/{{lego.imagebg}}" alt="background lego card">
+        <img src="/images/{{lego.legoImage}}" alt="background lego card">
       </div>
 </div>
 {% endfor %}
