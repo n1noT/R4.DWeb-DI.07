@@ -12,8 +12,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use stdClass;
-use App\Entity\Lego;
-use App\Entity\Collection;
 use App\Service\CreditsGenerator;
 use App\Service\DatabaseInterface;
 

@@ -5,7 +5,6 @@
 namespace App\Service;
 
 use App\Entity\Lego;
-use App\Entity\Collection;
 
 use PDO;
 
@@ -35,10 +34,13 @@ class DatabaseInterface
         $result = [];
 
         foreach ($data as $col) {
-            
+
             $name = $col['collection'];
             $link = str_replace(' ','_', strtolower($col['collection']));
-            $collection = new Collection($name, $link);
+            $collection = [
+                'name' => $name,
+                'link' => $link
+            ];
 
             array_push($result, $collection);
         }
