@@ -13,7 +13,12 @@ use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpFoundation\Response;
 use stdClass;
 use App\Service\CreditsGenerator;
+use App\Entity\Lego;
+use App\Repository\LegoRepository;
+use App\Entity\LegoCollection;
+use App\Repository\LegoCollectionRepository;
 use App\Service\DatabaseInterface;
+use Doctrine\ORM\EntityManagerInterface;
 
 /* le nom de la classe doit être cohérent avec le nom du fichier */
 
@@ -27,24 +32,23 @@ class LegoController extends AbstractController
 
     
     #[Route('/',)]
-    public function home(DatabaseInterface $dbinterface): Response
+    public function home(LegoRepository $legoRepository, LegoCollectionRepository $collectionRepository): Response
     {
         
-        $this->legos = $dbinterface->getAllLegos();
-        
-        return $this->render('lego.html.twig', ['legos' => $this->legos, 'collections'=> $dbinterface->getAllCollections()]);
+        return $this->render('lego.html.twig', ['legos' =>$legoRepository->findAll(),
+        'collections'=> $collectionRepository->findAll()
+    ]);
     }
 
 
 
-    #[Route('/{collection}', 'filter_by_collection', requirements: ['collection' => '(creator_expert|creator|harry_potter|star_wars)'])]
-    public function filter(DatabaseInterface $dbinterface, $collection): Response
+    #[Route('/{name}', 'filter_by_collection', requirements: ['name' => '(CreatorExpert|Creator|HarryPotter|StarWars)'])]
+    public function filter(LegoCollection $collection, LegoCollectionRepository $collectionRepository): Response
     {
-        $collection = str_replace('_',' ', strtolower($collection));
-        
-        $this->legos = $dbinterface->getLegosByCollection($collection);
 
-        return $this->render('lego.html.twig', ['legos' => $this->legos, 'collections'=> $dbinterface->getAllCollections()]);
+        return $this->render('lego.html.twig', ['legos' => $collection->getLegos(),
+        'collections'=> $collectionRepository->findAll()
+    ]);
         
     }
 
@@ -62,4 +66,13 @@ class LegoController extends AbstractController
     {
         die("Nino.");
     }
+
+    #[Route('/test/{name}', 'test')]
+    public function test(LegoCollection $collection): Response
+    {
+        dd($collection);
+    }
+
+
+
 }
